@@ -5,6 +5,7 @@ var drawKmap = true;
 var userSet = false;
 var sop = true;
 var drawGroups = true;
+var grayOrder = true;
 var essentials;
 
 var prevMinterms = [];
@@ -23,6 +24,7 @@ $(window).on('load', function() {
     $('input[type=radio][name=method]').change(onMethodChange);
     $('input[type=checkbox][name=draw-groups]').change(onDrawChange);
     $('input[type=checkbox][name=draw-kmap]').change(toggleDrawKmap);
+    $('input[type=checkbox][name=gray-order]').change(toggleGrayOrder);
 });
 
 $(window).resize(checkWindowSize);
@@ -80,6 +82,11 @@ function toggleDrawKmap() {
         $("#kmap").empty();
         $("#kmap-div").css("display", "none");
     }
+}
+
+function toggleGrayOrder() {
+    grayOrder = this.checked;
+    toggleDrawKmap();
 }
 
 function onDrawChange() {
@@ -676,22 +683,22 @@ function getMinterms() {
     let temp = getInputStr("#minterms").split(",");
     temp = temp.map(v => $.trim(v));
     temp = removeEmptyStrings(temp);
-    return temp.map(v => parseInt(v, 10));
+    return temp.map(v => parseInt(v, 16));
 }
 
 function setMinterms(minterms) {
-    $("#minterms").val(minterms.join(","));
+    $("#minterms").val(minterms.map(v => v.toString(16)).join(","));
 }
 
 function getDontCares() {
     let temp = getInputStr("#dont-cares").split(",");
     temp = temp.map(v => $.trim(v));
     temp = removeEmptyStrings(temp);
-    return temp.map(v => parseInt(v, 10));
+    return temp.map(v => parseInt(v, 16));
 }
 
 function setDontCares(dontCares) {
-    $('#dont-cares').val(dontCares.join(","));
+    $('#dont-cares').val(dontCares.map(v => v.toString(16)).join(","));
 }
 
 function termsInBounds(terms, termLimit) {
@@ -748,7 +755,7 @@ function intToBin(num, dim) {
 }
 
 function indexToGray(index) {
-    return (index ^ (index >> 1));
+    return grayOrder ? (index ^ (index >> 1)) : index;
 }
 
 function stripHtml(str) {
